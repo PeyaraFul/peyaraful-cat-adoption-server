@@ -55,6 +55,46 @@ export const getCatById = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export const createCat = async (req: Request, res: Response) => {};
+export const createCat = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const user = (req as any).user;
+
+    const {
+      name, age, breed, photo, description, location,
+      gender, healthStatus, vaccinationStatus, temperament
+    } = req.body;
+
+    if (!name || !age || !breed || !photo || !location) {
+      return res.status(400).json({ message: 'Name, age, breed, photo, and location are required' });
+    }
+
+    const newCat = {
+      ownerId: user._id,
+      name,
+      age: parseInt(age),
+      breed,
+      photo,
+      description: description || '',
+      location,
+      gender: gender || 'male',
+      healthStatus: healthStatus || 'Healthy',
+      vaccinationStatus: vaccinationStatus || 'Not vaccinated',
+      temperament: temperament || '',
+      status: 'available',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const result = await db.collection('cats').insertOne(newCat);
+
+    res.status(201).json({
+      message: 'Cat listing created successfully',
+      cat: { ...newCat, _id: result.insertedId }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
 export const updateCat = async (req: Request, res: Response) => {};
 export const deleteCat = async (req: Request, res: Response) => {};
