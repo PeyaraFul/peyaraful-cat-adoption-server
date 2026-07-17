@@ -96,5 +96,39 @@ export const createCat = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export const updateCat = async (req: Request, res: Response) => {};
+export const updateCat = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const user = (req as any).user;
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid cat ID' });
+    }
+
+    const cat = await db.collection('cats').findOne({ _id: new ObjectId(id) });
+
+    if (!cat) {
+      return res.status(404).json({ message: 'Cat not found' });
+    }
+
+    if (cat.ownerId !== user._id) {
+      return res.status(403).json({ message: 'You can only update your own cat listings' });
+    }
+
+    const updates = { ...req.body, updatedAt: new Date() };
+    delete updates._id;
+    delete updates.ownerId;
+    delete updates.createdAt;
+
+    await db.collection('cats').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updates }
+    );
+
+    res.json({ message: 'Cat updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
 export const deleteCat = async (req: Request, res: Response) => {};
