@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
+import catsRouter from './routes/cats';
 
 dotenv.config();
 
@@ -14,6 +15,9 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Routes
+app.use('/api/cats', catsRouter);
 
 // Health check
 app.get('/api/health', (_, res) => {
