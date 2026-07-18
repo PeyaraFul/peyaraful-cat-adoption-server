@@ -25,6 +25,19 @@ app.use('/api/stories', storiesRouter);
 app.use('/api/adoptions', adoptionsRouter);
 app.use('/api/admin', adminRouter);
 
+// Public stats for home page
+app.get('/api/stats', async (_, res) => {
+  try {
+    const db = (await import('./config/db')).getDB();
+    const totalCats = await db.collection('cats').countDocuments({ status: 'available' });
+    const totalUsers = await db.collection('users').countDocuments();
+    const totalAdoptions = await db.collection('adoption_requests').countDocuments({ status: 'approved' });
+    res.json({ totalCats, totalUsers, totalAdoptions });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
 // Health check
 app.get('/api/health', (_, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
