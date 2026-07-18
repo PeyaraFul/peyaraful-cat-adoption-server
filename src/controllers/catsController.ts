@@ -38,9 +38,10 @@ export const getAllCats = async (req: Request, res: Response) => {
 export const getCatById = async (req: Request, res: Response) => {
   try {
     const db = getDB();
-    const { id } = req.params;
+    let { id } = req.params as { id?: string | string[] };
+    if (Array.isArray(id)) id = id[0];
 
-    if (!ObjectId.isValid(id)) {
+    if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid cat ID' });
     }
 
@@ -100,9 +101,10 @@ export const updateCat = async (req: Request, res: Response) => {
   try {
     const db = getDB();
     const user = (req as any).user;
-    const { id } = req.params;
+    let { id } = req.params as { id?: string | string[] };
+    if (Array.isArray(id)) id = id[0];
 
-    if (!ObjectId.isValid(id)) {
+    if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid cat ID' });
     }
 
@@ -135,9 +137,10 @@ export const deleteCat = async (req: Request, res: Response) => {
   try {
     const db = getDB();
     const user = (req as any).user;
-    const { id } = req.params;
+    let { id } = req.params as { id?: string | string[] };
+    if (Array.isArray(id)) id = id[0];
 
-    if (!ObjectId.isValid(id)) {
+    if (!id || !ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid cat ID' });
     }
 

@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import catsRouter from './routes/cats';
+import storiesRouter from './routes/stories';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/cats', catsRouter);
+app.use('/api/stories', storiesRouter);
 
 // Health check
 app.get('/api/health', (_, res) => {
