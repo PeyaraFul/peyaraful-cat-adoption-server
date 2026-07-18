@@ -62,5 +62,43 @@ export const getAllCats = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export const deleteCat = async (req: Request, res: Response) => {};
-export const getAllAdoptions = async (req: Request, res: Response) => {};
+export const deleteCat = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid cat ID' });
+    }
+
+    const cat = await db.collection('cats').findOne({ _id: new ObjectId(id) });
+    if (!cat) {
+      return res.status(404).json({ message: 'Cat not found' });
+    }
+
+    await db.collection('cats').deleteOne({ _id: new ObjectId(id) });
+
+    res.json({ message: 'Cat deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+export const getAllAdoptions = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const { status } = req.query;
+
+    const filter: any = {};
+    if (status) filter.status = status;
+
+    const adoptions = await db.collection('adoption_requests')
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json(adoptions);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
