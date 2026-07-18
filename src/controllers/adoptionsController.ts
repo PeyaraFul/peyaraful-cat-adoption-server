@@ -125,4 +125,36 @@ export const approveRequest = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export const rejectRequest = async (req: Request, res: Response) => {};
+export const rejectRequest = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const user = (req as any).user;
+    const id: string = req.params.id;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid request ID' });
+    }
+
+    const request = await db.collection('adoption_requests').findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+
+    if (request.ownerId !== user._id) {
+      return res.status(403).json({ message: 'Only the cat owner can reject requests' });
+    }
+
+    if (request.status !== 'pending') {
+      return res.status(400).json({ message: 'This request has already been processed' });
+    }
+
+    await db.collection('adoption_requests').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { status: 'rejected', updatedAt: new Date() } }
+    );
+
+    res.json({ message: 'Request rejected' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
