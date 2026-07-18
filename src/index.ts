@@ -6,6 +6,7 @@ import catsRouter from './routes/cats';
 import storiesRouter from './routes/stories';
 import adoptionsRouter from './routes/adoptions';
 import adminRouter from './routes/admin';
+import authRouter from './routes/auth';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRouter);
 app.use('/api/cats', catsRouter);
 app.use('/api/stories', storiesRouter);
 app.use('/api/adoptions', adoptionsRouter);
