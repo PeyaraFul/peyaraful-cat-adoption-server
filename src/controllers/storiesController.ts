@@ -62,7 +62,7 @@ export const deleteStory = async (req: Request, res: Response) => {
   try {
     const db = getDB();
     const user = (req as any).user;
-    const { id } = req.params;
+    const id: string = req.params.id;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid story ID' });
