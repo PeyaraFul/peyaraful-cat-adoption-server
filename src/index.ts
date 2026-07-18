@@ -5,6 +5,7 @@ import { connectDB } from './config/db';
 import catsRouter from './routes/cats';
 import storiesRouter from './routes/stories';
 import adoptionsRouter from './routes/adoptions';
+import adminRouter from './routes/admin';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use('/api/cats', catsRouter);
 app.use('/api/stories', storiesRouter);
 app.use('/api/adoptions', adoptionsRouter);
+app.use('/api/admin', adminRouter);
 
 // Health check
 app.get('/api/health', (_, res) => {
