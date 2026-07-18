@@ -8,8 +8,35 @@ export const getStats = async (req: Request, res: Response) => {
     const totalCats = await db.collection('cats').countDocuments();
     const totalUsers = await db.collection('users').countDocuments();
     const totalAdoptions = await db.collection('adoption_requests').countDocuments({ status: 'approved' });
+    const pendingAdoptions = await db.collection('adoption_requests').countDocuments({ status: 'pending' });
+    const rejectedAdoptions = await db.collection('adoption_requests').countDocuments({ status: 'rejected' });
 
-    res.json({ totalCats, totalUsers, totalAdoptions });
+    const catsByStatus = {
+      available: await db.collection('cats').countDocuments({ status: 'available' }),
+      pending: await db.collection('cats').countDocuments({ status: 'pending' }),
+      adopted: await db.collection('cats').countDocuments({ status: 'adopted' })
+    };
+
+    const now = new Date();
+    const catsPerMonth: { month: string; count: number }[] = [];
+    const usersPerMonth: { month: string; count: number }[] = [];
+
+    for (let i = 5; i >= 0; i--) {
+      const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+      const label = start.toLocaleString('default', { month: 'short', year: '2-digit' });
+
+      const catCount = await db.collection('cats').countDocuments({ createdAt: { $gte: start, $lte: end } });
+      catsPerMonth.push({ month: label, count: catCount });
+
+      const userCount = await db.collection('users').countDocuments({ createdAt: { $gte: start, $lte: end } });
+      usersPerMonth.push({ month: label, count: userCount });
+    }
+
+    res.json({
+      totalCats, totalUsers, totalAdoptions, pendingAdoptions, rejectedAdoptions,
+      catsByStatus, catsPerMonth, usersPerMonth
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
