@@ -57,7 +57,21 @@ export const createAdoption = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export const getReceivedRequests = async (req: Request, res: Response) => {};
+export const getReceivedRequests = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const user = (req as any).user;
+
+    const requests = await db.collection('adoption_requests')
+      .find({ ownerId: user._id })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
 export const getSentRequests = async (req: Request, res: Response) => {};
 export const approveRequest = async (req: Request, res: Response) => {};
 export const rejectRequest = async (req: Request, res: Response) => {};
