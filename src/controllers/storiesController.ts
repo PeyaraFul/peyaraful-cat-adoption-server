@@ -94,3 +94,29 @@ export const deleteStory = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const likeStory = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const rawId: string | string[] = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid story ID' });
+    }
+
+    const story = await db.collection('stories').findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $inc: { likes: 1 } },
+      { returnDocument: 'after' }
+    );
+
+    if (!story) {
+      return res.status(404).json({ message: 'Story not found' });
+    }
+
+    res.json({ likes: story.likes });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
