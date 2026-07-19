@@ -8,8 +8,13 @@ import { authMiddleware } from '../middleware/auth.js';
 const router = Router();
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '7d';
+
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET is not defined in environment variables');
+  return secret;
+}
 
 router.post('/google', async (req: Request, res: Response) => {
   try {
@@ -37,6 +42,7 @@ router.post('/google', async (req: Request, res: Response) => {
 
     if (user) {
       const updates: any = {};
+      if (!user.googleId) updates.googleId = googleId;
       if (name && name !== user.name) updates.name = name;
       if (picture && picture !== user.image) updates.image = picture;
       if (Object.keys(updates).length > 0) {
@@ -60,7 +66,7 @@ router.post('/google', async (req: Request, res: Response) => {
       user = await users.findOne({ _id: result.insertedId });
     }
 
-    const token = jwt.sign({ userId: user!._id.toString() }, JWT_SECRET!, { expiresIn: JWT_EXPIRES_IN });
+    const token = jwt.sign({ userId: user!._id.toString() }, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
 
     res.json({
       token,

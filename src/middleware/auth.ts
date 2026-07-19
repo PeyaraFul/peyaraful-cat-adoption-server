@@ -3,10 +3,14 @@ import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { getDB } from '../config/db.js';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 export interface JwtPayload {
   userId: string;
+}
+
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET is not defined in environment variables');
+  return secret;
 }
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +21,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET!) as JwtPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as JwtPayload;
 
     const db = getDB();
     const user = await db.collection('users').findOne({ _id: new ObjectId(decoded.userId) });

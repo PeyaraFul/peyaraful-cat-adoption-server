@@ -32,6 +32,16 @@ export const createAdoption = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'You already have a pending request for this cat' });
     }
 
+    let ownerName = '';
+    let ownerEmail = '';
+    if (cat.ownerId) {
+      const owner = await db.collection('users').findOne({ _id: new ObjectId(cat.ownerId) });
+      if (owner) {
+        ownerName = owner.name || '';
+        ownerEmail = owner.email || '';
+      }
+    }
+
     const newRequest = {
       catId,
       catName: cat.name,
@@ -40,8 +50,8 @@ export const createAdoption = async (req: Request, res: Response) => {
       requesterName: user.name,
       requesterEmail: user.email,
       ownerId: cat.ownerId,
-      ownerName: cat.ownerName || '',
-      ownerEmail: cat.ownerEmail || '',
+      ownerName,
+      ownerEmail,
       status: 'pending',
       message: message || '',
       createdAt: new Date()
