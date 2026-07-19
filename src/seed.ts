@@ -12,25 +12,25 @@ if (!MONGODB_URI) {
 const DB_NAME = 'peyaraful_cat_adoption';
 
 const catPhotos = [
-  'https://cdn2.thecatapi.com/images/0XYvRd7oD.jpg',
-  'https://cdn2.thecatapi.com/images/MTk3ODc3Mw.jpg',
-  'https://cdn2.thecatapi.com/images/1d5p0r8l5.jpg',
-  'https://cdn2.thecatapi.com/images/ai6Jps8sx.jpg',
-  'https://cdn2.thecatapi.com/images/eih1p0rzN.jpg',
-  'https://cdn2.thecatapi.com/images/5kA3e4o8q.jpg',
-  'https://cdn2.thecatapi.com/images/56h3r9o8p.jpg',
-  'https://cdn2.thecatapi.com/images/8d6dq8k9p.jpg',
+  'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=600&q=80',
+  'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80',
+  'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&q=80',
+  'https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=600&q=80',
+  'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=600&q=80',
+  'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=600&q=80',
+  'https://images.unsplash.com/photo-1494256997604-768d1f608cac?w=600&q=80',
+  'https://images.unsplash.com/photo-1548247416-ec66f4900b2e?w=600&q=80',
 ];
 
 const storyImages = [
-  'https://cdn2.thecatapi.com/images/2l3f0r8l5.jpg',
-  'https://cdn2.thecatapi.com/images/3m4n5o6p.jpg',
-  'https://cdn2.thecatapi.com/images/4p5q6r7s.jpg',
-  'https://cdn2.thecatapi.com/images/5r6s7t8u.jpg',
-  'https://cdn2.thecatapi.com/images/6s7t8u9v.jpg',
-  'https://cdn2.thecatapi.com/images/7t8u9v0w.jpg',
-  'https://cdn2.thecatapi.com/images/8u9v0w1x.jpg',
-  'https://cdn2.thecatapi.com/images/9v0w1x2y.jpg',
+  'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80',
+  'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=600&q=80',
+  'https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=600&q=80',
+  'https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=600&q=80',
+  'https://images.unsplash.com/photo-1533738363-b7f9aef128ce?w=600&q=80',
+  'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&q=80',
+  'https://images.unsplash.com/photo-1494256997604-768d1f608cac?w=600&q=80',
+  'https://images.unsplash.com/photo-1548247416-ec66f4900b2e?w=600&q=80',
 ];
 
 const userPhotos = [
