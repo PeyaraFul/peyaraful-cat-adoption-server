@@ -11,7 +11,7 @@ export const getAllStories = async (req: Request, res: Response) => {
       .toArray();
     res.json(stories);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const getTopStories = async (req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const getTopStories = async (req: Request, res: Response) => {
       .toArray();
     res.json(stories);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const createStory = async (req: Request, res: Response) => {
@@ -63,14 +63,15 @@ export const createStory = async (req: Request, res: Response) => {
       story: { ...newStory, _id: result.insertedId }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const deleteStory = async (req: Request, res: Response) => {
   try {
     const db = getDB();
     const user = (req as any).user;
-    const id: string = req.params.id;
+    const rawId: string | string[] = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid story ID' });
@@ -90,6 +91,6 @@ export const deleteStory = async (req: Request, res: Response) => {
 
     res.json({ message: 'Story deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };

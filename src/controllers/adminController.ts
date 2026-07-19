@@ -38,7 +38,7 @@ export const getStats = async (req: Request, res: Response) => {
       catsByStatus, catsPerMonth, usersPerMonth
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -47,21 +47,28 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const db = getDB();
     const users = await db.collection('users')
       .find()
+      .project({ googleId: 0 })
       .sort({ createdAt: -1 })
       .toArray();
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const db = getDB();
-    const { id } = req.params;
+    const admin = (req as any).user;
+    const rawId: string | string[] = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    if (admin._id === id) {
+      return res.status(400).json({ message: 'Admin cannot delete themselves' });
     }
 
     const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
@@ -73,7 +80,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -86,13 +93,14 @@ export const getAllCats = async (req: Request, res: Response) => {
       .toArray();
     res.json(cats);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const deleteCat = async (req: Request, res: Response) => {
   try {
     const db = getDB();
-    const { id } = req.params;
+    const rawId: string | string[] = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid cat ID' });
@@ -104,10 +112,11 @@ export const deleteCat = async (req: Request, res: Response) => {
     }
 
     await db.collection('cats').deleteOne({ _id: new ObjectId(id) });
+    await db.collection('adoption_requests').deleteMany({ catId: id });
 
     res.json({ message: 'Cat deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -126,6 +135,6 @@ export const getAllAdoptions = async (req: Request, res: Response) => {
 
     res.json(adoptions);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };

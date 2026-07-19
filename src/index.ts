@@ -36,7 +36,7 @@ app.get('/api/stats', async (_, res) => {
     const totalAdoptions = await db.collection('adoption_requests').countDocuments({ status: 'approved' });
     res.json({ totalCats, totalUsers, totalAdoptions });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

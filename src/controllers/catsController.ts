@@ -2,6 +2,10 @@ import { Request, Response } from 'express';
 import { getDB } from '../config/db.js';
 import { ObjectId } from 'mongodb';
 
+function escapeRegex(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export const getAllCats = async (req: Request, res: Response) => {
   try {
     const db = getDB();
@@ -12,16 +16,17 @@ export const getAllCats = async (req: Request, res: Response) => {
     if (location) filter.location = location;
     if (gender) filter.gender = gender;
     if (age) {
-      const ageNum = parseInt(age as string);
+      const ageNum = parseInt(age as string, 10);
       if (!isNaN(ageNum)) {
         filter.age = { $lte: ageNum };
       }
     }
     if (search) {
+      const safe = escapeRegex(search as string);
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { breed: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { name: { $regex: safe, $options: 'i' } },
+        { breed: { $regex: safe, $options: 'i' } },
+        { description: { $regex: safe, $options: 'i' } }
       ];
     }
 
@@ -32,7 +37,7 @@ export const getAllCats = async (req: Request, res: Response) => {
 
     res.json(cats);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const getCatById = async (req: Request, res: Response) => {
@@ -53,7 +58,7 @@ export const getCatById = async (req: Request, res: Response) => {
 
     res.json(cat);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const createCat = async (req: Request, res: Response) => {
@@ -74,7 +79,7 @@ export const createCat = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Name must be a non-empty string' });
     }
 
-    const ageNum = parseInt(age);
+    const ageNum = parseInt(age, 10);
     if (isNaN(ageNum) || ageNum < 0) {
       return res.status(400).json({ message: 'Age must be a valid positive number' });
     }
@@ -107,7 +112,7 @@ export const createCat = async (req: Request, res: Response) => {
       cat: { ...newCat, _id: result.insertedId }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const updateCat = async (req: Request, res: Response) => {
@@ -131,10 +136,13 @@ export const updateCat = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'You can only update your own cat listings' });
     }
 
-    const updates = { ...req.body, updatedAt: new Date() };
-    delete updates._id;
-    delete updates.ownerId;
-    delete updates.createdAt;
+    const allowed = ['name', 'age', 'breed', 'photo', 'description', 'location', 'gender', 'healthStatus', 'vaccinationStatus', 'temperament'];
+    const updates: any = { updatedAt: new Date() };
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) {
+        updates[key] = typeof req.body[key] === 'string' ? req.body[key].trim() : req.body[key];
+      }
+    }
 
     await db.collection('cats').updateOne(
       { _id: new ObjectId(id) },
@@ -143,7 +151,7 @@ export const updateCat = async (req: Request, res: Response) => {
 
     res.json({ message: 'Cat updated successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const deleteCat = async (req: Request, res: Response) => {
@@ -171,6 +179,6 @@ export const deleteCat = async (req: Request, res: Response) => {
 
     res.json({ message: 'Cat deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };

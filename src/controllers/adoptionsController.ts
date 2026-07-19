@@ -64,7 +64,7 @@ export const createAdoption = async (req: Request, res: Response) => {
       request: { ...newRequest, _id: result.insertedId }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const getReceivedRequests = async (req: Request, res: Response) => {
@@ -79,7 +79,7 @@ export const getReceivedRequests = async (req: Request, res: Response) => {
 
     res.json(requests);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const getSentRequests = async (req: Request, res: Response) => {
@@ -94,77 +94,63 @@ export const getSentRequests = async (req: Request, res: Response) => {
 
     res.json(requests);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const approveRequest = async (req: Request, res: Response) => {
   try {
     const db = getDB();
     const user = (req as any).user;
-    const id: string = req.params.id;
+    const rawId: string | string[] = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid request ID' });
     }
 
-    const request = await db.collection('adoption_requests').findOne({ _id: new ObjectId(id) });
-    if (!request) {
-      return res.status(404).json({ message: 'Request not found' });
-    }
-
-    if (request.ownerId !== user._id) {
-      return res.status(403).json({ message: 'Only the cat owner can approve requests' });
-    }
-
-    if (request.status !== 'pending') {
-      return res.status(400).json({ message: 'This request has already been processed' });
-    }
-
-    await db.collection('adoption_requests').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { status: 'approved', updatedAt: new Date() } }
+    const updated = await db.collection('adoption_requests').findOneAndUpdate(
+      { _id: new ObjectId(id), ownerId: user._id, status: 'pending' },
+      { $set: { status: 'approved', updatedAt: new Date() } },
+      { returnDocument: 'after' }
     );
 
+    if (!updated) {
+      return res.status(404).json({ message: 'Request not found or already processed' });
+    }
+
     await db.collection('cats').updateOne(
-      { _id: new ObjectId(request.catId) },
+      { _id: new ObjectId(updated.catId) },
       { $set: { status: 'adopted', updatedAt: new Date() } }
     );
 
     res.json({ message: 'Request approved successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 export const rejectRequest = async (req: Request, res: Response) => {
   try {
     const db = getDB();
     const user = (req as any).user;
-    const id: string = req.params.id;
+    const rawId2: string | string[] = req.params.id;
+    const id = Array.isArray(rawId2) ? rawId2[0] : rawId2;
 
     if (!ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid request ID' });
     }
 
-    const request = await db.collection('adoption_requests').findOne({ _id: new ObjectId(id) });
-    if (!request) {
-      return res.status(404).json({ message: 'Request not found' });
-    }
-
-    if (request.ownerId !== user._id) {
-      return res.status(403).json({ message: 'Only the cat owner can reject requests' });
-    }
-
-    if (request.status !== 'pending') {
-      return res.status(400).json({ message: 'This request has already been processed' });
-    }
-
-    await db.collection('adoption_requests').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { status: 'rejected', updatedAt: new Date() } }
+    const updated = await db.collection('adoption_requests').findOneAndUpdate(
+      { _id: new ObjectId(id), ownerId: user._id, status: 'pending' },
+      { $set: { status: 'rejected', updatedAt: new Date() } },
+      { returnDocument: 'after' }
     );
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Request not found or already processed' });
+    }
 
     res.json({ message: 'Request rejected' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: 'Server error' });
   }
 };
