@@ -9,7 +9,7 @@ function escapeRegex(str: string) {
 export const getAllCats = async (req: Request, res: Response) => {
   try {
     const db = getDB();
-    const { location, gender, age, search } = req.query;
+    const { location, gender, age, search, page, limit } = req.query;
 
     const filter: any = { status: 'available' };
 
@@ -30,12 +30,21 @@ export const getAllCats = async (req: Request, res: Response) => {
       ];
     }
 
-    const cats = await db.collection('cats')
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .toArray();
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit as string, 10) || 12));
+    const skip = (pageNum - 1) * limitNum;
 
-    res.json(cats);
+    const [cats, total] = await Promise.all([
+      db.collection('cats')
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .toArray(),
+      db.collection('cats').countDocuments(filter)
+    ]);
+
+    res.json({ cats, total, page: pageNum, limit: limitNum });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
