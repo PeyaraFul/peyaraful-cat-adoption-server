@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getDB } from '../config/db';
+import { getDB } from '../config/db.js';
 import { ObjectId } from 'mongodb';
 
 export const getAllCats = async (req: Request, res: Response) => {
@@ -70,14 +70,27 @@ export const createCat = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Name, age, breed, photo, and location are required' });
     }
 
+    if (typeof name !== 'string' || name.trim().length < 1) {
+      return res.status(400).json({ message: 'Name must be a non-empty string' });
+    }
+
+    const ageNum = parseInt(age);
+    if (isNaN(ageNum) || ageNum < 0) {
+      return res.status(400).json({ message: 'Age must be a valid positive number' });
+    }
+
+    if (gender && !['male', 'female'].includes(gender)) {
+      return res.status(400).json({ message: 'Gender must be male or female' });
+    }
+
     const newCat = {
       ownerId: user._id,
-      name,
-      age: parseInt(age),
-      breed,
-      photo,
-      description: description || '',
-      location,
+      name: name.trim(),
+      age: ageNum,
+      breed: breed.trim(),
+      photo: photo.trim(),
+      description: (description || '').trim(),
+      location: location.trim(),
       gender: gender || 'male',
       healthStatus: healthStatus || 'Healthy',
       vaccinationStatus: vaccinationStatus || 'Not vaccinated',

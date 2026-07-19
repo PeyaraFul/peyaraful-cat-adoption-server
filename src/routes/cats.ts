@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import { getAllCats, getCatById, createCat, updateCat, deleteCat } from '../controllers/catsController';
-import { dummyAuth } from '../middleware/auth';
+import { getAllCats, getCatById, createCat, updateCat, deleteCat } from '../controllers/catsController.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
 router.get('/', getAllCats);
 router.get('/:id', getCatById);
-router.post('/', dummyAuth, createCat);
-router.put('/:id', dummyAuth, updateCat);
-router.delete('/:id', dummyAuth, deleteCat);
+router.post('/', authMiddleware, createCat);
+router.put('/:id', authMiddleware, updateCat);
+router.delete('/:id', authMiddleware, deleteCat);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getDB } from '../config/db';
+import { getDB } from '../config/db.js';
 import { ObjectId } from 'mongodb';
 
 export const getStats = async (req: Request, res: Response) => {

@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { getAllStories, getTopStories, createStory, deleteStory } from '../controllers/storiesController';
-import { dummyAuth } from '../middleware/auth';
+import { getAllStories, getTopStories, createStory, deleteStory } from '../controllers/storiesController.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
 router.get('/', getAllStories);
 router.get('/top', getTopStories);
-router.post('/', dummyAuth, createStory);
-router.delete('/:id', dummyAuth, deleteStory);
+router.post('/', authMiddleware, createStory);
+router.delete('/:id', authMiddleware, deleteStory);
 
 export default router;

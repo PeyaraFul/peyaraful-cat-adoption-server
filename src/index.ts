@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB } from './config/db';
-import catsRouter from './routes/cats';
-import storiesRouter from './routes/stories';
-import adoptionsRouter from './routes/adoptions';
-import adminRouter from './routes/admin';
-import authRouter from './routes/auth';
+import { connectDB } from './config/db.js';
+import catsRouter from './routes/cats.js';
+import storiesRouter from './routes/stories.js';
+import adoptionsRouter from './routes/adoptions.js';
+import adminRouter from './routes/admin.js';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 

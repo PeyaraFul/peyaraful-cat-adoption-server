@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getDB } from '../config/db';
+import { getDB } from '../config/db.js';
 import { ObjectId } from 'mongodb';
 
 export const getAllStories = async (req: Request, res: Response) => {
@@ -37,13 +37,21 @@ export const createStory = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Cat name and content are required' });
     }
 
+    if (typeof catName !== 'string' || catName.trim().length < 1) {
+      return res.status(400).json({ message: 'Cat name must be a non-empty string' });
+    }
+
+    if (typeof content !== 'string' || content.trim().length < 10) {
+      return res.status(400).json({ message: 'Story content must be at least 10 characters' });
+    }
+
     const newStory = {
       userId: user._id,
       userName: user.name,
       userImage: user.image || '',
-      catName,
-      content,
-      image: image || '',
+      catName: catName.trim(),
+      content: content.trim(),
+      image: (image || '').trim(),
       likes: 0,
       createdAt: new Date()
     };
