@@ -7,6 +7,7 @@ import storiesRouter from './routes/stories.js';
 import adoptionsRouter from './routes/adoptions.js';
 import adminRouter from './routes/admin.js';
 import authRouter from './routes/auth.js';
+import chatRouter from './routes/chat.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/cats', catsRouter);
 app.use('/api/stories', storiesRouter);
 app.use('/api/adoptions', adoptionsRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/chat', chatRouter);
 
 // Public stats for home page
 app.get('/api/stats', async (_, res) => {
