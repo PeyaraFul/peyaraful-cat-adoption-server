@@ -158,4 +158,49 @@ router.put('/profile', authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
+router.post('/demo', async (_req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const users = db.collection('users');
+
+    let user = await users.findOne({ email: 'demo@user.com' });
+
+    if (!user) {
+      const newUser = {
+        email: 'demo@user.com',
+        name: 'Demo User',
+        image: '',
+        role: 'user' as const,
+        location: '',
+        phone: '',
+        bio: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const result = await users.insertOne(newUser);
+      user = await users.findOne({ _id: result.insertedId });
+    }
+
+    const token = jwt.sign({ userId: user!._id.toString() }, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
+
+    res.json({
+      token,
+      user: {
+        _id: user!._id.toString(),
+        name: user!.name,
+        email: user!.email,
+        image: user!.image || '',
+        location: user!.location || '',
+        phone: user!.phone || '',
+        bio: user!.bio || '',
+        role: user!.role || 'user',
+        createdAt: user!.createdAt,
+      },
+    });
+  } catch (error: any) {
+    console.error('Demo login error:', error?.message || error);
+    res.status(500).json({ message: 'Demo login failed' });
+  }
+});
+
 export default router;
