@@ -98,6 +98,7 @@ export const deleteStory = async (req: Request, res: Response) => {
 export const likeStory = async (req: Request, res: Response) => {
   try {
     const db = getDB();
+    const user = (req as any).user;
     const rawId: string | string[] = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
@@ -105,17 +106,29 @@ export const likeStory = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid story ID' });
     }
 
-    const story = await db.collection('stories').findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $inc: { likes: 1 } },
-      { returnDocument: 'after' }
-    );
-
+    const story = await db.collection('stories').findOne({ _id: new ObjectId(id) });
     if (!story) {
       return res.status(404).json({ message: 'Story not found' });
     }
 
-    res.json({ likes: story.likes });
+    const likedBy: string[] = story.likedBy || [];
+    const userId = user._id.toString();
+    const alreadyLiked = likedBy.includes(userId);
+
+    if (alreadyLiked) {
+      await db.collection('stories').updateOne(
+        { _id: new ObjectId(id) },
+        { $inc: { likes: -1 }, $pull: { likedBy: userId } }
+      );
+    } else {
+      await db.collection('stories').updateOne(
+        { _id: new ObjectId(id) },
+        { $inc: { likes: 1 }, $addToSet: { likedBy: userId } }
+      );
+    }
+
+    const updated = await db.collection('stories').findOne({ _id: new ObjectId(id) });
+    res.json({ likes: updated!.likes, liked: !alreadyLiked });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

@@ -7,7 +7,7 @@ const router = Router();
 router.get('/', getAllStories);
 router.get('/top', getTopStories);
 router.post('/', authMiddleware, createStory);
-router.post('/:id/like', likeStory);
+router.post('/:id/like', authMiddleware, likeStory);
 router.delete('/:id', authMiddleware, deleteStory);
 
 export default router;
