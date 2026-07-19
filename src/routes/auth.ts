@@ -7,8 +7,13 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_EXPIRES_IN = '7d';
+
+function getGoogleClientId() {
+  const id = process.env.GOOGLE_CLIENT_ID;
+  if (!id) throw new Error('GOOGLE_CLIENT_ID is not defined');
+  return id;
+}
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -23,9 +28,12 @@ router.post('/google', async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Google credential is required' });
     }
 
+    const clientId = getGoogleClientId();
+    const googleClient = new OAuth2Client(clientId);
+
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: clientId,
     });
 
     const payload = ticket.getPayload();
@@ -82,9 +90,9 @@ router.post('/google', async (req: Request, res: Response) => {
         createdAt: user!.createdAt,
       },
     });
-  } catch (error) {
-    console.error('Google auth error:', error);
-    res.status(500).json({ message: 'Google authentication failed' });
+  } catch (error: any) {
+    console.error('Google auth error:', error?.message || error);
+    res.status(500).json({ message: 'Google authentication failed', detail: error?.message || 'Unknown error' });
   }
 });
 
