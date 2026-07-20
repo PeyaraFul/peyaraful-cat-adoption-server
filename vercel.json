@@ -1,0 +1,7 @@
+{
+  "installCommand": "npm install --omit=dev",
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index.ts" }
+  ]
+}

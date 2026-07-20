@@ -1,5 +1,8 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { IncomingMessage, ServerResponse } from 'http';
 import { connectDB, getDB } from '../src/config/db.js';
+
+type VercelRequest = IncomingMessage & { body?: any; query?: Record<string, string> };
+type VercelResponse = ServerResponse & { status: (code: number) => VercelResponse; json: (data: any) => VercelResponse; setHeader: (name: string, value: string) => VercelResponse; write: (data: string) => boolean; end: (data?: string) => VercelResponse; };
 
 let isConnected = false;
 
