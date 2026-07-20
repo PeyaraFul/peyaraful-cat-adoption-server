@@ -1,5 +1,6 @@
 {
   "installCommand": "npm install --omit=dev",
+  "buildCommand": "echo 'no build needed'",
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index.ts" }
