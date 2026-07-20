@@ -1,6 +1,6 @@
 {
+  "buildCommand": "",
   "outputDirectory": "public",
-  "framework": null,
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index.ts" }
   ]
