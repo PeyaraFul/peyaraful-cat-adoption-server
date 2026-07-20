@@ -1,6 +1,6 @@
 {
-  "outputDirectory": ".",
-  "installCommand": "npm install",
+  "outputDirectory": "public",
+  "framework": null,
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index.ts" }
   ]
