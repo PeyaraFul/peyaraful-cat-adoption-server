@@ -2,7 +2,7 @@
   "name": "peyaraful_cat_adoption_server",
   "version": "1.0.0",
   "description": "Backend API for Peyaraful Cat Adoption",
-  "main": "src/index.js",
+  "main": "api/index.ts",
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
