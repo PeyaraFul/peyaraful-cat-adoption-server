@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: peyaraful-cat-adoption-server
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: CLIENT_URL
+        value: https://peyaraful-cat-adoption.vercel.app
+      - key: GEMINI_API_KEY
+        sync: false
